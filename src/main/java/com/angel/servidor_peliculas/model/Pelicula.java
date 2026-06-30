@@ -19,7 +19,7 @@ import jakarta.persistence.ElementCollection;
 public class Pelicula {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
     private String nombre;
     private double nota;
     @ElementCollection
