@@ -33,8 +33,8 @@ public class PeliculaServiceTest {
     public void setting() {
 		ArrayList<String> lista = new ArrayList<>();
 		lista.add("Suspense");
-        film1 = new Pelicula(0, "El Silencio de los Corderos", 10, lista, LocalDate.of(1991, 9, 6));
-        film2 = new Pelicula(0, "Seven", 10, lista, LocalDate.of(1995, 1, 10));
+        film1 = new Pelicula((long) 0, "El Silencio de los Corderos", 10, lista, LocalDate.of(1991, 9, 6));
+        film2 = new Pelicula((long) 0, "Seven", 10, lista, LocalDate.of(1995, 1, 10));
     }
 
     @AfterEach
@@ -83,7 +83,7 @@ public class PeliculaServiceTest {
         service.add(film1);
 		ArrayList<String> lista = new ArrayList<>();
 		lista.add("Suspense");
-        Pelicula actualizada = new Pelicula(1, "El Silencio de los Corderos", 7, lista, LocalDate.of(1991, 9, 6));
+        Pelicula actualizada = new Pelicula((long) 1, "El Silencio de los Corderos", 7, lista, LocalDate.of(1991, 9, 6));
         service.update(actualizada);
         assertEquals(7, service.getById(1).getNota());
     }
@@ -93,7 +93,7 @@ public class PeliculaServiceTest {
     void updateInexistenteTest() {
 		ArrayList<String> lista2 = new ArrayList<>();
 		lista2.add("Drama");
-        Pelicula inexistente = new Pelicula(999, "Inexistente", 5, lista2, LocalDate.of(2000, 1, 1));
+        Pelicula inexistente = new Pelicula((long) 999, "Inexistente", 5, lista2, LocalDate.of(2000, 1, 1));
         service.update(inexistente);
         assertTrue(service.getAll().isEmpty());
     }

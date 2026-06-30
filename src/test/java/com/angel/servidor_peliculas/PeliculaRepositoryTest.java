@@ -28,9 +28,9 @@ public class PeliculaRepositoryTest {
 		lista.add("Suspense");
 		ArrayList<String> lista2 = new ArrayList<>();
 		lista2.add("Drama Histórico");
-		film1 = new Pelicula(0,"El Silencio de los Corderos",10,lista,LocalDate.of(1991, 9, 6));
-		film2 = new Pelicula(0,"Seven",10,lista,LocalDate.of(1995, 1, 10));
-		film3 = new Pelicula(0,"La lista de Schindler",10,lista2,LocalDate.of(1993, 11, 30));
+		film1 = new Pelicula((long) 0,"El Silencio de los Corderos",10,lista,LocalDate.of(1991, 9, 6));
+		film2 = new Pelicula((long) 0,"Seven",10,lista,LocalDate.of(1995, 1, 10));
+		film3 = new Pelicula((long) 0,"La lista de Schindler",10,lista2,LocalDate.of(1993, 11, 30));
 	}
 	@BeforeAll
 	static void limpiarFichero() throws IOException {
@@ -79,7 +79,7 @@ public class PeliculaRepositoryTest {
 		repository.save(film1);
 		ArrayList<String> lista = new ArrayList<>();
 		lista.add("Suspense");
-		Pelicula p1 = new Pelicula (1,"El Silencio de los Corderos",7,lista,LocalDate.of(1991, 9, 6));
+		Pelicula p1 = new Pelicula ((long) 1,"El Silencio de los Corderos",7,lista,LocalDate.of(1991, 9, 6));
 		repository.save(p1);
 		assertEquals(repository.findAll().get(0).getNota(),7);
 		repository.deleteById((long) 1);
