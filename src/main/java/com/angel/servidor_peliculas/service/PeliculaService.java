@@ -9,28 +9,27 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.angel.servidor_peliculas.model.Pelicula;
-import com.angel.servidor_peliculas.repository.IPeliculaRepository;
 import com.angel.servidor_peliculas.repository.PeliculaRepository;
 @Service 
 public class PeliculaService implements IPeliculaService{
 	
-	private IPeliculaRepository repository;
+	private PeliculaRepository repository;
 	
 	private static final Logger logger = LoggerFactory.getLogger(PeliculaService.class);
 
-	public PeliculaService(IPeliculaRepository repository) {
+	public PeliculaService(PeliculaRepository repository) {
 		this.repository = repository;
 	}
 	@Override
 	public ArrayList<Pelicula> getAll() {
-		return repository.getAll();
+		return new ArrayList<>(repository.findAll());
 	}
 
 	@Override
 	public Pelicula getById(long id) {
 		if(repository.existsById(id)) {
 			logger.info("La pelicula con id " + id + " se encuentra en el sistema");
-			return repository.getById(id);
+			return repository.findById(id).get();
 		}
 		logger.info("La pelicula con id " + id + " no se encuentra en el sistema");
 		return null;
@@ -40,7 +39,7 @@ public class PeliculaService implements IPeliculaService{
 	public boolean add(Pelicula pelicula) {
 		if(!repository.existsByNombreAndFecha(pelicula.getNombre(), pelicula.getFecha())) {
 			logger.info("La pelicula  no se encuentra en el sistema, procedemos a añadirla");
-			repository.add(pelicula);
+			repository.save(pelicula);
 			return true;
 		}
 		else {
@@ -54,7 +53,7 @@ public class PeliculaService implements IPeliculaService{
 	public boolean delete(long id) {
 		if(repository.existsById(id)) {
 			logger.info("La pelicula se encuentra en el sistema, procedemos a borrarla");
-			repository.delete(id);
+			repository.deleteById(id);;
 			return true;
 		}
 		else {
@@ -67,7 +66,7 @@ public class PeliculaService implements IPeliculaService{
 	public boolean update(Pelicula pelicula) {
 		if(repository.existsById(pelicula.getId())) {
 			logger.info("La pelicula  se encuentra en el sistema, procedemos a actualizarla");
-			repository.update(pelicula);
+			repository.save(pelicula);
 			return true;
 		}
 		else {
@@ -93,10 +92,10 @@ public class PeliculaService implements IPeliculaService{
 				c = Comparator.comparing(Pelicula::getFecha);
 				break;
 			default:
-				return repository.getAll();
+				return new ArrayList<>(repository.findAll());
 		}
 		if(!ascendente) c=c.reversed();
-		return new ArrayList<>(repository.getAll().stream()
+		return new ArrayList<>(repository.findAll().stream()
 				.sorted(c).collect(Collectors.toList()));
 	}
 }

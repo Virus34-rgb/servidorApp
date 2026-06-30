@@ -5,13 +5,24 @@ import java.util.ArrayList;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.ElementCollection;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
+@Entity
 public class Pelicula {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private String nombre;
     private double nota;
+    @ElementCollection
     private ArrayList<String> genero;
     private LocalDate fecha;
 }
