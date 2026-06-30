@@ -1,7 +1,7 @@
 package com.angel.servidor_peliculas.model;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,6 +23,6 @@ public class Pelicula {
     private String nombre;
     private double nota;
     @ElementCollection
-    private ArrayList<String> genero;
+    private List<String> genero;
     private LocalDate fecha;
 }
