@@ -25,4 +25,5 @@ public class Pelicula {
     @ElementCollection
     private List<String> genero;
     private LocalDate fecha;
+    private String posterPath;
 }
