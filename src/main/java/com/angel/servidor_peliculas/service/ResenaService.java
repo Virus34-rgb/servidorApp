@@ -48,7 +48,7 @@ public class ResenaService implements IResenaService{
 			film = pelicula.get();
 		}
 		else {
-			film = new Pelicula(null,request.getNombre(),request.getNota(),request.getTmbdId(),request.getGeneros()
+			film = new Pelicula(null,request.getNombre(),request.getTmbdId(),request.getGeneros()
 					,request.getFecha(),request.getPosterPath());
 			peliculaRepository.save(film);
 		}

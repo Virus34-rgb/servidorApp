@@ -22,7 +22,6 @@ public class Pelicula {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String nombre;
-    private double nota;
     @Column(unique = true)
     private Long tmdbId;
     @ElementCollection
