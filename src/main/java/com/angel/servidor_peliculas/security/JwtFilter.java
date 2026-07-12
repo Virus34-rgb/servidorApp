@@ -32,7 +32,7 @@ public class JwtFilter extends OncePerRequestFilter {
 		logger.info("Request URI: {}", request.getRequestURI());
 		try {
 			String header = request.getHeader("Authorization");
-			if (request.getRequestURI().equals("/auth/login")) {
+			if (request.getRequestURI().startsWith("/auth/")) {
 			    filterChain.doFilter(request, response);
 			    return;
 			}
