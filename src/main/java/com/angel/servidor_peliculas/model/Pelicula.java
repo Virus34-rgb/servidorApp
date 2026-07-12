@@ -10,6 +10,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 
 @Data
@@ -22,6 +23,8 @@ public class Pelicula {
     private Long id;
     private String nombre;
     private double nota;
+    @Column(unique = true)
+    private Long tmdbId;
     @ElementCollection
     private List<String> genero;
     private LocalDate fecha;

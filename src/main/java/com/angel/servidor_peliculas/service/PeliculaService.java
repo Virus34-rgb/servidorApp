@@ -82,9 +82,6 @@ public class PeliculaService implements IPeliculaService{
 			case "nombre":
 				c = Comparator.comparing(Pelicula::getNombre);
 				break;
-			case "nota":
-				c = Comparator.comparing(Pelicula::getNota);
-				break;
 			/*case "genero":
 				c = Comparator.comparing(Pelicula::getGenero);
 				break;*/

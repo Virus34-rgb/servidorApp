@@ -10,6 +10,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.angel.servidor_peliculas.repository.UsuarioRepository;
+
 import java.util.Collections;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -18,11 +20,11 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 	private static final Logger logger = LoggerFactory.getLogger(JwtFilter.class);
-	@Value("${app.usuario}")
-	private String usuario;
 	JwtUtil jwtUtil;
-	public JwtFilter(JwtUtil jwtUtil) {
+	private final UsuarioRepository usuarioRepository;
+	public JwtFilter(JwtUtil jwtUtil,UsuarioRepository usuarioRepository) {
 		this.jwtUtil = jwtUtil;
+		this.usuarioRepository = usuarioRepository;
 	}
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -39,19 +41,19 @@ public class JwtFilter extends OncePerRequestFilter {
 				response.setStatus(401);
 				return;
 			}
+			String username = jwtUtil.extractUsername(header.substring(7));
 			if(!jwtUtil.isTokenValid(header.substring(7))){
 				logger.error("TOKEN NO VALIDO");
 				response.setStatus(401);
 				return;
 			}
-
-			else if(!jwtUtil.extractUsername(header.substring(7)).equals(usuario)) {
+			else if(usuarioRepository.findByUsername(username).isEmpty()) {
 				logger.error("USUARIO NO VALIDO");
 				response.setStatus(401);
 				return;
 			}
 			UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-				    usuario, null, Collections.emptyList()
+				    username, null, Collections.emptyList()
 				);
 				SecurityContextHolder.getContext().setAuthentication(auth);
 			filterChain.doFilter(request, response);
@@ -62,7 +64,5 @@ public class JwtFilter extends OncePerRequestFilter {
 			response.setStatus(401);
 			return;
 		}
-		
 	}
-
 }
