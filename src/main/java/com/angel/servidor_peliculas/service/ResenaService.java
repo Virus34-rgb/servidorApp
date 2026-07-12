@@ -5,11 +5,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.angel.servidor_peliculas.controller.ResenaController;
 import com.angel.servidor_peliculas.dto.ResenaRequest;
 import com.angel.servidor_peliculas.dto.ResenaResponse;
 import com.angel.servidor_peliculas.model.Pelicula;
@@ -23,6 +26,7 @@ public class ResenaService implements IResenaService{
 	private PeliculaRepository peliculaRepository;
 	private ResenaRepository resenaRepository;
 	private UsuarioRepository usuarioRepository;
+	private static final Logger logger = LoggerFactory.getLogger(ResenaService.class);
 	public ResenaService(PeliculaRepository peliculaRepository, ResenaRepository resenaRepository,
 			UsuarioRepository usuarioRepository) {
 		this.peliculaRepository = peliculaRepository;
@@ -34,6 +38,7 @@ public class ResenaService implements IResenaService{
 	public ResenaResponse crearResena(String username, ResenaRequest request) throws ResponseStatusException {
 		Optional<Usuario> usuario = usuarioRepository.findByUsername(username);
 		if(usuario.isEmpty()) {
+			logger.error("El usuario {} , no esta presente en el sistema");
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado");
 		}
 		Usuario user = usuario.get();
@@ -48,12 +53,14 @@ public class ResenaService implements IResenaService{
 			peliculaRepository.save(film);
 		}
 		if(resenaRepository.findByUsuarioIdAndPeliculaId(user.getId(), film.getId()).isPresent()) {
+			logger.error("Ya existe una reseña para la pelicula {} del usuario {} ", user.getUsername(),film.getNombre());
 			throw new ResponseStatusException(HttpStatus.CONFLICT, "Ya existe una reseña tuya para esta película");
 		}
 		LocalDate fechaAhora = LocalDate.now();
 		Resena resena = new Resena(null,user,film,
 				request.getNota(),request.getOpinion(),fechaAhora);
 		resenaRepository.save(resena);
+		logger.info("Reseña registrada en el sistema correctamente");
 		return aResponse(resena);
 	}
 
@@ -61,6 +68,7 @@ public class ResenaService implements IResenaService{
 	public List<ResenaResponse> listarMisResenas(String username) throws ResponseStatusException {
 		Optional<Usuario> usuario = usuarioRepository.findByUsername(username);
 		if(usuario.isEmpty()) {
+			logger.error("El usuario {} , no esta presente en el sistema");
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado");
 		}
 		Usuario user = usuario.get();
@@ -69,6 +77,7 @@ public class ResenaService implements IResenaService{
 		for(Resena resena : lista) {
 			response.add(aResponse(resena));
 		}
+		logger.info("Lista de peliculas devuelta correctamente");
 		return response;
 	}
 	@Transactional
@@ -76,15 +85,18 @@ public class ResenaService implements IResenaService{
 	public ResenaResponse actualizarResena(String username, Long resenaId, ResenaRequest request) throws ResponseStatusException {
 		Optional<Resena> res = resenaRepository.findById(resenaId);
 		if(res.isEmpty()) {
+			logger.error("Reseña no disponible en el sistema");
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Reseña no encontrada");
 		}
 		Resena resena = res.get();
 		if(!resena.getUsuario().getUsername().equals(username)) {
+			logger.error("El usuario no puede modificar una reseña que no ha sifo escrita por el");
 			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "La reseña no puede ser alterada por el usuario");
 		}
 		resena.setNota(request.getNota());
 		resena.setOpinion(request.getOpinion());
 		resenaRepository.save(resena);
+		logger.info("Reseña actualizada correctamente");
 		return aResponse(resena);
 	}
 
@@ -92,12 +104,15 @@ public class ResenaService implements IResenaService{
 	public void borrarResena(String username, Long resenaId) throws ResponseStatusException {
 		Optional<Resena> res = resenaRepository.findById(resenaId);
 		if(res.isEmpty()) {
+			logger.error("Reseña no disponible en el sistema");
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Reseña no encontrada");
 		}
 		Resena resena = res.get();
 		if(!resena.getUsuario().getUsername().equals(username)) {
+			logger.error("El usuario no puede modificar una reseña que no ha sifo escrita por el");
 			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "La reseña no puede ser alterada por el usuario");
 		}
+		logger.info("Reseña borrada correctamente");
 		resenaRepository.deleteById(resenaId);	
 	}
 	private ResenaResponse aResponse(Resena resena) {
