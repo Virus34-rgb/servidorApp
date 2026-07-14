@@ -10,4 +10,5 @@ public interface IResenaService {
     List<ResenaResponse> listarMisResenas(String username);
     ResenaResponse actualizarResena(String username, Long resenaId, ResenaRequest request);
     void borrarResena(String username, Long resenaId);
+    List<ResenaResponse> listarMisResenasFiltradas(String username, String filtro, boolean ascendente);
 }

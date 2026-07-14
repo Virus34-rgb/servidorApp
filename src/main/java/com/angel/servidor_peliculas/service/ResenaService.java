@@ -2,17 +2,16 @@ package com.angel.servidor_peliculas.service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
-import com.angel.servidor_peliculas.controller.ResenaController;
 import com.angel.servidor_peliculas.dto.ResenaRequest;
 import com.angel.servidor_peliculas.dto.ResenaResponse;
 import com.angel.servidor_peliculas.model.Pelicula;
@@ -38,19 +37,22 @@ public class ResenaService implements IResenaService{
 	public ResenaResponse crearResena(String username, ResenaRequest request) throws ResponseStatusException {
 		Optional<Usuario> usuario = usuarioRepository.findByUsername(username);
 		if(usuario.isEmpty()) {
-			logger.error("El usuario {} , no esta presente en el sistema");
+			logger.error("El usuario {} , no esta presente en el sistema",username);
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado");
 		}
 		Usuario user = usuario.get();
-		Optional<Pelicula> pelicula = peliculaRepository.findByTmdbId(request.getTmbdId());
 		Pelicula film;
-		if(pelicula.isPresent()) {
-			film = pelicula.get();
-		}
-		else {
-			film = new Pelicula(null,request.getNombre(),request.getTmbdId(),request.getGeneros()
-					,request.getFecha(),request.getPosterPath());
-			peliculaRepository.save(film);
+		if (request.getTmbdId() != null) {
+		    Optional<Pelicula> pelicula = peliculaRepository.findByTmdbId(request.getTmbdId());
+		    if (pelicula.isPresent()) {
+		        film = pelicula.get();
+		    } else {
+		        film = new Pelicula(null, request.getNombre(), request.getTmbdId(), request.getGeneros(), request.getFecha(), request.getPosterPath());
+		        peliculaRepository.save(film);
+		    }
+		} else {
+		    film = new Pelicula(null, request.getNombre(), null, request.getGeneros(), request.getFecha(), request.getPosterPath());
+		    peliculaRepository.save(film);
 		}
 		if(resenaRepository.findByUsuarioIdAndPeliculaId(user.getId(), film.getId()).isPresent()) {
 			logger.error("Ya existe una reseña para la pelicula {} del usuario {} ", user.getUsername(),film.getNombre());
@@ -90,7 +92,7 @@ public class ResenaService implements IResenaService{
 		}
 		Resena resena = res.get();
 		if(!resena.getUsuario().getUsername().equals(username)) {
-			logger.error("El usuario no puede modificar una reseña que no ha sifo escrita por el");
+			logger.error("El usuario no puede modificar una reseña que no ha sido escrita por el");
 			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "La reseña no puede ser alterada por el usuario");
 		}
 		resena.setNota(request.getNota());
@@ -109,7 +111,7 @@ public class ResenaService implements IResenaService{
 		}
 		Resena resena = res.get();
 		if(!resena.getUsuario().getUsername().equals(username)) {
-			logger.error("El usuario no puede modificar una reseña que no ha sifo escrita por el");
+			logger.error("El usuario no puede modificar una reseña que no ha sido escrita por el");
 			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "La reseña no puede ser alterada por el usuario");
 		}
 		logger.info("Reseña borrada correctamente");
@@ -120,5 +122,37 @@ public class ResenaService implements IResenaService{
 	    return new ResenaResponse(resena.getId(), film.getId(), film.getTmdbId(),
 	            film.getNombre(), film.getGenero(), film.getFecha(), film.getPosterPath(),
 	            resena.getNota(), resena.getOpinion(), resena.getFechaPublicacion());
+	}
+	@Override
+	public List<ResenaResponse> listarMisResenasFiltradas(String username, String filtro, boolean ascendente) {
+	    Optional<Usuario> usuarioOpt = usuarioRepository.findByUsername(username);
+	    if (usuarioOpt.isEmpty()) {
+	        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado");
+	    }
+	    Usuario usuario = usuarioOpt.get();
+	    List<Resena> lista = resenaRepository.findByUsuarioId(usuario.getId());
+	    Comparator<Resena> c;
+	    switch (filtro) {
+	        case "nombre":
+	            c = Comparator.comparing(r -> r.getPelicula().getNombre());
+	            break;
+	        case "nota":
+	            c = Comparator.comparingDouble(Resena::getNota);
+	            break;
+	        case "fecha":
+	            c = Comparator.comparing(r -> r.getPelicula().getFecha());
+	            break;
+	        default:
+	            c = Comparator.comparing(Resena::getId);
+	            break;
+	    }
+	    if (!ascendente) {
+	        c = c.reversed();
+	    }
+
+	    return lista.stream()
+	            .sorted(c)
+	            .map(this::aResponse)
+	            .collect(Collectors.toList());
 	}
 }
