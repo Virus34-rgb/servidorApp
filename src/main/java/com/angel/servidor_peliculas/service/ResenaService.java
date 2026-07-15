@@ -32,6 +32,16 @@ public class ResenaService implements IResenaService{
 		this.resenaRepository = resenaRepository;
 		this.usuarioRepository = usuarioRepository;
 	}
+	@Override
+	public ResenaResponse obtenerResena(Long resenaId) {
+		Optional<Resena> res = resenaRepository.findById(resenaId);
+		if(res.isEmpty()) {
+			logger.error("Reseña no disponible en el sistema");
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Reseña no encontrada");
+		}
+		Resena resena = res.get();
+		return aResponse(resena);
+	}
 	@Transactional
 	@Override
 	public ResenaResponse crearResena(String username, ResenaRequest request) throws ResponseStatusException {

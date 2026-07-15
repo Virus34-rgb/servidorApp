@@ -6,6 +6,7 @@ import com.angel.servidor_peliculas.dto.ResenaRequest;
 import com.angel.servidor_peliculas.dto.ResenaResponse;
 
 public interface IResenaService {
+	ResenaResponse obtenerResena(Long resenaId);
     ResenaResponse crearResena(String username, ResenaRequest request);
     List<ResenaResponse> listarMisResenas(String username);
     ResenaResponse actualizarResena(String username, Long resenaId, ResenaRequest request);
