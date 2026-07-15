@@ -84,7 +84,7 @@ public class ResenaService implements IResenaService{
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado");
 		}
 		Usuario user = usuario.get();
-		List<Resena> lista = resenaRepository.findByUsuarioId(user.getId());
+		List<Resena> lista = resenaRepository.findByUsuarioIdConPelicula(user.getId());
 		List<ResenaResponse> response = new ArrayList<>();
 		for(Resena resena : lista) {
 			response.add(aResponse(resena));
@@ -140,7 +140,7 @@ public class ResenaService implements IResenaService{
 	        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado");
 	    }
 	    Usuario usuario = usuarioOpt.get();
-	    List<Resena> lista = resenaRepository.findByUsuarioId(usuario.getId());
+	    List<Resena> lista = resenaRepository.findByUsuarioIdConPelicula(usuario.getId());
 	    Comparator<Resena> c;
 	    switch (filtro) {
 	        case "nombre":
