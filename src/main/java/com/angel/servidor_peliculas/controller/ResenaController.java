@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.angel.servidor_peliculas.dto.ResenaPublicaResponse;
 import com.angel.servidor_peliculas.dto.ResenaRequest;
 import com.angel.servidor_peliculas.dto.ResenaResponse;
 import com.angel.servidor_peliculas.service.IResenaService;
@@ -58,5 +59,9 @@ public class ResenaController {
 	        @RequestParam boolean ascendente) {
 	    String username = SecurityContextHolder.getContext().getAuthentication().getName();
 	    return ResponseEntity.ok(resenaService.listarMisResenasFiltradas(username, filtro, ascendente));
+	}
+	@GetMapping("/pelicula/{peliculaId}")
+	public ResponseEntity<List<ResenaPublicaResponse>> resenasDePelicula(@PathVariable Long peliculaId) {
+	    return ResponseEntity.ok(resenaService.listarResenasDePelicula(peliculaId));
 	}
 }

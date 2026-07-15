@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+
+import com.angel.servidor_peliculas.dto.ResenaPublicaResponse;
 import com.angel.servidor_peliculas.dto.ResenaRequest;
 import com.angel.servidor_peliculas.dto.ResenaResponse;
 import com.angel.servidor_peliculas.model.Pelicula;
@@ -75,7 +77,6 @@ public class ResenaService implements IResenaService{
 		logger.info("Reseña registrada en el sistema correctamente");
 		return aResponse(resena);
 	}
-
 	@Override
 	public List<ResenaResponse> listarMisResenas(String username) throws ResponseStatusException {
 		Optional<Usuario> usuario = usuarioRepository.findByUsername(username);
@@ -164,5 +165,15 @@ public class ResenaService implements IResenaService{
 	            .sorted(c)
 	            .map(this::aResponse)
 	            .collect(Collectors.toList());
+	}
+	@Override
+	public List<ResenaPublicaResponse> listarResenasDePelicula(Long peliculaId) {
+		List<ResenaPublicaResponse> lista = new ArrayList<>();
+		for(Resena resena : resenaRepository.findByPeliculaId(peliculaId)) {
+			ResenaPublicaResponse elemento = new ResenaPublicaResponse(resena.getId(),resena.getUsuario().getUsername()
+					,resena.getNota(),resena.getOpinion(),resena.getFechaPublicacion());
+			lista.add(elemento);
+		}
+		return lista;
 	}
 }

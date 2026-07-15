@@ -2,12 +2,14 @@ package com.angel.servidor_peliculas.service;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import com.angel.servidor_peliculas.dto.PeliculaResponse;
 import com.angel.servidor_peliculas.model.Pelicula;
 import com.angel.servidor_peliculas.repository.PeliculaRepository;
 @Service 
@@ -76,23 +78,16 @@ public class PeliculaService implements IPeliculaService{
 		
 	}
 	@Override
-	public ArrayList<Pelicula> getAllFiltered(String filtro, boolean ascendente) {
-		Comparator<Pelicula> c;
-		switch (filtro) {
-			case "nombre":
-				c = Comparator.comparing(Pelicula::getNombre);
-				break;
-			/*case "genero":
-				c = Comparator.comparing(Pelicula::getGenero);
-				break;*/
-			case "fecha":
-				c = Comparator.comparing(Pelicula::getFecha);
-				break;
-			default:
-				return new ArrayList<>(repository.findAll());
+	public Optional<PeliculaResponse> buscarPorTmdbId(Long tmdbId) {
+		Optional<Pelicula> pelicula = repository.findByTmdbId(tmdbId);
+		if(pelicula.isPresent()) {
+			Pelicula pel = pelicula.get();
+			PeliculaResponse res = new PeliculaResponse(pel.getId(),pel.getTmdbId(),pel.getNombre(),pel.getGenero()
+					,pel.getFecha(),pel.getPosterPath());
+			return Optional.of(res);
 		}
-		if(!ascendente) c=c.reversed();
-		return new ArrayList<>(repository.findAll().stream()
-				.sorted(c).collect(Collectors.toList()));
+		else {
+			return Optional.empty();
+		}
 	}
 }

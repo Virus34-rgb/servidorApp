@@ -12,4 +12,6 @@ public interface ResenaRepository extends JpaRepository<Resena,Long> {
 	List<Resena> findByUsuarioIdConPelicula(@Param("usuarioId") Long usuarioId);
 
 	Optional<Resena> findByUsuarioIdAndPeliculaId(Long usuarioId, Long peliculaId);
+	@Query("SELECT r FROM Resena r JOIN FETCH r.usuario WHERE r.pelicula.id = :peliculaId")
+	List<Resena> findByPeliculaId(@Param("peliculaId") Long peliculaId);
 }
