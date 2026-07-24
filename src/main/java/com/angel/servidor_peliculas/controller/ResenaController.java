@@ -32,6 +32,9 @@ public class ResenaController {
 	@PostMapping
 	public ResponseEntity<ResenaResponse> crear(@RequestBody ResenaRequest request) {
 	    String username = SecurityContextHolder.getContext().getAuthentication().getName();
+	    System.out.println(
+	            "AUTH: " + SecurityContextHolder.getContext().getAuthentication()
+	        );
 	    ResenaResponse response = resenaService.crearResena(username, request);
 	    return ResponseEntity.ok(response);
 	}
