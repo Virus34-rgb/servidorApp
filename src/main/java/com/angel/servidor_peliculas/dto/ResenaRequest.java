@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ResenaRequest {
-	private Long tmbdId;
+	private Long tmdbId;
 	private String nombre;
 	private List<String> generos;
 	private LocalDate fecha;

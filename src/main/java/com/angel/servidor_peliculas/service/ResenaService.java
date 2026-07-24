@@ -54,12 +54,12 @@ public class ResenaService implements IResenaService{
 		}
 		Usuario user = usuario.get();
 		Pelicula film;
-		if (request.getTmbdId() != null) {
-		    Optional<Pelicula> pelicula = peliculaRepository.findByTmdbId(request.getTmbdId());
+		if (request.getTmdbId() != null) {
+		    Optional<Pelicula> pelicula = peliculaRepository.findByTmdbId(request.getTmdbId());
 		    if (pelicula.isPresent()) {
 		        film = pelicula.get();
 		    } else {
-		        film = new Pelicula(null, request.getNombre(), request.getTmbdId(), request.getGeneros(), request.getFecha(), request.getPosterPath());
+		        film = new Pelicula(null, request.getNombre(), request.getTmdbId(), request.getGeneros(), request.getFecha(), request.getPosterPath());
 		        peliculaRepository.save(film);
 		    }
 		} else {
@@ -68,6 +68,10 @@ public class ResenaService implements IResenaService{
 		}
 		logger.info("Nueva pelicula: id={}, tmdb={}", film.getId(), film.getTmdbId());
 		peliculaRepository.save(film);
+		logger.info("Película guardada: id={}, tmdbId={}, nombre={}",
+		        film.getId(),
+		        film.getTmdbId(),
+		        film.getNombre());
 		if(resenaRepository.findByUsuarioIdAndPeliculaId(user.getId(), film.getId()).isPresent()) {
 			logger.error("Ya existe una reseña para la pelicula {} del usuario {} ", user.getUsername(),film.getNombre());
 			throw new ResponseStatusException(HttpStatus.CONFLICT, "Ya existe una reseña tuya para esta película");
@@ -75,6 +79,7 @@ public class ResenaService implements IResenaService{
 		LocalDate fechaAhora = LocalDate.now();
 		Resena resena = new Resena(null,user,film,
 				request.getNota(),request.getOpinion(),fechaAhora);
+		logger.info("Reseña apunta a película id={}", film.getId());
 		resenaRepository.save(resena);
 		logger.info("Reseña registrada en el sistema correctamente");
 		return aResponse(resena);
