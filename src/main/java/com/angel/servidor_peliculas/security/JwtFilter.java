@@ -31,39 +31,38 @@ public class JwtFilter extends OncePerRequestFilter {
 			throws ServletException, IOException {
 		logger.info("Request URI: {}", request.getRequestURI());
 		try {
-			String header = request.getHeader("Authorization");
-			logger.info("Authorization header: {}", request.getHeader("Authorization"));
-			if (request.getRequestURI().startsWith("/auth/")) {
-			    filterChain.doFilter(request, response);
-			    return;
-			}
-			if (header == null || !header.startsWith("Bearer ")) {
-				logger.error("Header null");
-				response.setStatus(401);
-				return;
-			}
-			String username = jwtUtil.extractUsername(header.substring(7));
-			if(!jwtUtil.isTokenValid(header.substring(7))){
-				logger.error("TOKEN NO VALIDO");
-				response.setStatus(401);
-				return;
-			}
-			else if(usuarioRepository.findByUsername(username).isEmpty()) {
-				logger.error("USUARIO NO VALIDO");
-				response.setStatus(401);
-				return;
-			}
-			UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-				    username, null, Collections.emptyList()
-				);
-				SecurityContextHolder.getContext().setAuthentication(auth);
-			filterChain.doFilter(request, response);
-			
+		    String header = request.getHeader("Authorization");
+
+		    if (request.getRequestURI().startsWith("/auth/")) {
+		        filterChain.doFilter(request, response);
+		        return;
+		    }
+		    if (header == null || !header.startsWith("Bearer ")) {
+		        response.setStatus(401);
+		        return;
+		    }
+		    String token = header.substring(7);
+		    if(!jwtUtil.isTokenValid(token)){
+		        response.setStatus(401);
+		        return;
+		    }
+		    String username = jwtUtil.extractUsername(token);
+		    UsernamePasswordAuthenticationToken auth =
+		        new UsernamePasswordAuthenticationToken(
+		            username,
+		            null,
+		            Collections.emptyList()
+		        );
+
+		    SecurityContextHolder.getContext().setAuthentication(auth);
+
 		}
 		catch(Exception e){
-			logger.error("ERROR: {}", e.getMessage());
-			response.setStatus(401);
-			return;
+		    logger.error("ERROR validando JWT: {}", e.getMessage());
+		    response.setStatus(401);
+		    return;
 		}
+
+		filterChain.doFilter(request,response);
 	}
 }
