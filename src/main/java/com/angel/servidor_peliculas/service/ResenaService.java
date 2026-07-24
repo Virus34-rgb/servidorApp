@@ -66,6 +66,8 @@ public class ResenaService implements IResenaService{
 		    film = new Pelicula(null, request.getNombre(), null, request.getGeneros(), request.getFecha(), request.getPosterPath());
 		    peliculaRepository.save(film);
 		}
+		logger.info("Nueva pelicula: id={}, tmdb={}", film.getId(), film.getTmdbId());
+		peliculaRepository.save(film);
 		if(resenaRepository.findByUsuarioIdAndPeliculaId(user.getId(), film.getId()).isPresent()) {
 			logger.error("Ya existe una reseña para la pelicula {} del usuario {} ", user.getUsername(),film.getNombre());
 			throw new ResponseStatusException(HttpStatus.CONFLICT, "Ya existe una reseña tuya para esta película");
